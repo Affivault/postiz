@@ -46,6 +46,20 @@ const nextConfig = {
   },
   async rewrites() {
     return [
+      // Frontend hosted apart from the backend (e.g. Vercel): serve the API and
+      // uploaded files from the backend server under the frontend's own domain
+      ...(process.env.BACKEND_PROXY_URL
+        ? [
+            {
+              source: '/api/:path*',
+              destination: `${process.env.BACKEND_PROXY_URL}/api/:path*`,
+            },
+            {
+              source: '/uploads/:path*',
+              destination: `${process.env.BACKEND_PROXY_URL}/uploads/:path*`,
+            },
+          ]
+        : []),
       {
         source: '/uploads/:path*',
         destination:
