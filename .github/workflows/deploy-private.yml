@@ -1,8 +1,8 @@
 ---
 name: "Deploy Private Instance"
 
-# Builds this repo into a Docker image on every push to main and rolls it out
-# to the private server set up with deploy/private/setup.sh.
+# Builds this repo into a Docker image on every push to main, then redeploys
+# Render (render.yaml) and/or the server set up with deploy/private/setup.sh.
 on:
   workflow_dispatch:
   push:
@@ -21,6 +21,8 @@ jobs:
   build:
     if: github.repository_owner != 'gitroomhq'
     runs-on: ubuntu-latest
+    env:
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
     outputs:
       image: ${{ steps.image.outputs.image }}
     steps:
@@ -55,6 +57,10 @@ jobs:
             ${{ steps.image.outputs.image }}:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Redeploy on Render
+        if: env.RENDER_DEPLOY_HOOK_URL != ''
+        run: curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL" > /dev/null
 
   deploy:
     needs: build
