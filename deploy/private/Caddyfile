@@ -1,0 +1,5 @@
+# Automatic HTTPS (Let's Encrypt) for your domain, proxied to Postiz.
+{$DOMAIN} {
+	encode gzip
+	reverse_proxy postiz:5000
+}
