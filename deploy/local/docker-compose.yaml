@@ -68,7 +68,7 @@ services:
       POSTGRES_USER: temporal
       POSTGRES_PASSWORD: temporal
     volumes:
-      - temporal-postgres:/var/lib/postgresql/data
+      - temporal-db:/var/lib/postgresql/data
 
   temporal:
     image: temporalio/auto-setup:1.28.1
@@ -82,9 +82,12 @@ services:
       POSTGRES_PWD: temporal
       POSTGRES_SEEDS: temporal-postgres
       ENABLE_ES: 'false'
+      # Without Elasticsearch only 3 Text search attributes fit; leave the
+      # slots for Acre Social instead of Temporal's sample attributes
+      SKIP_ADD_CUSTOM_SEARCH_ATTRIBUTES: 'true'
 
 volumes:
   acre-uploads:
   acre-postgres:
   acre-redis:
-  temporal-postgres:
+  temporal-db:

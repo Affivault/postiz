@@ -88,6 +88,10 @@ services:
           property: password
       - key: ENABLE_ES
         value: 'false'
+      # Without Elasticsearch only 3 Text search attributes fit; leave the
+      # slots for Acre Social instead of Temporal's sample attributes
+      - key: SKIP_ADD_CUSTOM_SEARCH_ATTRIBUTES
+        value: 'true'
 
   - type: keyvalue
     name: acre-redis

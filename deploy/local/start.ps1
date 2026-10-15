@@ -6,6 +6,13 @@ $ErrorActionPreference = 'Continue'
 Set-Location $PSScriptRoot
 $files = @('-f', 'docker-compose.yaml', '-f', 'docker-compose.public.yaml')
 
+# Fetch the latest setup files so changes never need a new ZIP download
+$base = 'https://raw.githubusercontent.com/Affivault/postiz/main/deploy/local'
+foreach ($f in @('docker-compose.yaml', 'docker-compose.public.yaml')) {
+  try { Invoke-WebRequest -UseBasicParsing -Uri "$base/$f" -OutFile "$f.new"; Move-Item -Force "$f.new" $f }
+  catch { Remove-Item -ErrorAction SilentlyContinue "$f.new" }
+}
+
 if (-not (Test-Path .env)) {
   $bytes = New-Object byte[] 32
   [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
