@@ -16,6 +16,8 @@ case "${1:-}" in
     exit 0
     ;;
   public)
+    echo "Checking for the latest version of Acre Social..."
+    docker compose pull acre || echo "Could not check for updates, starting the version you have."
     docker compose -f docker-compose.yaml -f docker-compose.public.yaml up -d --force-recreate tunnel
     echo "Getting a public link..."
     URL=""
@@ -34,6 +36,8 @@ case "${1:-}" in
   *)
     docker compose -f docker-compose.yaml -f docker-compose.public.yaml rm -sf tunnel >/dev/null 2>&1 || true
     URL="http://localhost:5000"
+    echo "Checking for the latest version of Acre Social..."
+    docker compose pull acre || echo "Could not check for updates, starting the version you have."
     docker compose up -d
     ;;
 esac

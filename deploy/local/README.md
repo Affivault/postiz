@@ -33,3 +33,9 @@ Double-click `Stop Acre Social`. Your accounts, posts and uploads are kept and c
 ## For terminal users
 
 The same actions are `./start.sh`, `./start.sh public` and `./start.sh stop` (Windows: `start.ps1`).
+
+## Updating
+
+Every start checks for the newest version of Acre Social and downloads it if there is one, so you never need to download the ZIP again. After a change has been made, double-click **Stop Acre Social**, then **Start Acre Social**.
+
+If you see "port is already allocated" or "address already in use" on a Mac, turn off **System Settings → General → AirDrop & Handoff → AirPlay Receiver**: it uses the same port (5000).

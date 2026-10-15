@@ -20,6 +20,10 @@ if ($mode -eq 'stop') {
   exit 0
 }
 
+Write-Host 'Checking for the latest version of Acre Social...'
+docker compose pull acre
+if ($LASTEXITCODE -ne 0) { Write-Host 'Could not check for updates, starting the version you have.' }
+
 if ($mode -eq 'public') {
   docker compose @files up -d --force-recreate tunnel
   Write-Host 'Getting a public link...'
