@@ -1,0 +1,13 @@
+# Added on top of docker-compose.yaml by "start public": serves Acre Social
+# over https through a free Cloudflare quick tunnel (no account needed).
+services:
+  acre:
+    environment:
+      NOT_SECURED: ''
+
+  tunnel:
+    image: cloudflare/cloudflared:2024.12.2
+    # Not restarted on its own: a new tunnel gets a new address, so run
+    # "start public" again after a reboot
+    restart: 'no'
+    command: tunnel --no-autoupdate --url http://acre:5000

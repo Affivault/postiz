@@ -1,0 +1,90 @@
+# Acre Social on your own computer.
+# Start it with ./start.sh (Mac/Linux) or .\start.ps1 (Windows), see README.md.
+name: acre-social
+
+services:
+  acre:
+    image: ghcr.io/affivault/postiz:latest
+    # The image is built for Intel/AMD; Apple Silicon Macs run it through emulation
+    platform: linux/amd64
+    restart: unless-stopped
+    environment:
+      MAIN_URL: ${PUBLIC_URL:-http://localhost:5000}
+      FRONTEND_URL: ${PUBLIC_URL:-http://localhost:5000}
+      NEXT_PUBLIC_BACKEND_URL: ${PUBLIC_URL:-http://localhost:5000}/api
+      BACKEND_INTERNAL_URL: http://localhost:3000
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://acre:acre@acre-postgres:5432/acre
+      REDIS_URL: redis://acre-redis:6379
+      TEMPORAL_ADDRESS: temporal:7233
+      IS_GENERAL: 'true'
+      # Plain http on localhost; the public override clears this for https
+      NOT_SECURED: 'true'
+      STORAGE_PROVIDER: local
+      UPLOAD_DIRECTORY: /uploads
+      NEXT_PUBLIC_UPLOAD_DIRECTORY: /uploads
+    ports:
+      - '5000:5000'
+    volumes:
+      - acre-uploads:/uploads
+    depends_on:
+      acre-postgres:
+        condition: service_healthy
+      acre-redis:
+        condition: service_healthy
+      temporal:
+        condition: service_started
+
+  acre-postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: acre
+      POSTGRES_PASSWORD: acre
+      POSTGRES_DB: acre
+    volumes:
+      - acre-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: pg_isready -U acre -d acre
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  acre-redis:
+    image: redis:7.2
+    restart: unless-stopped
+    volumes:
+      - acre-redis:/data
+    healthcheck:
+      test: redis-cli ping
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  temporal-postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: temporal
+      POSTGRES_PASSWORD: temporal
+    volumes:
+      - temporal-postgres:/var/lib/postgresql/data
+
+  temporal:
+    image: temporalio/auto-setup:1.28.1
+    restart: unless-stopped
+    depends_on:
+      - temporal-postgres
+    environment:
+      DB: postgres12
+      DB_PORT: 5432
+      POSTGRES_USER: temporal
+      POSTGRES_PWD: temporal
+      POSTGRES_SEEDS: temporal-postgres
+      ENABLE_ES: 'false'
+
+volumes:
+  acre-uploads:
+  acre-postgres:
+  acre-redis:
+  temporal-postgres:
