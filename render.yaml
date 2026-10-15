@@ -11,6 +11,7 @@ services:
   - type: web
     name: acre-social
     runtime: image
+    region: frankfurt
     image:
       url: ghcr.io/affivault/postiz:latest
     plan: standard
@@ -62,6 +63,7 @@ services:
   - type: pserv
     name: acre-temporal
     runtime: image
+    region: frankfurt
     image:
       url: docker.io/temporalio/auto-setup:1.28.1
     plan: starter
@@ -89,17 +91,20 @@ services:
 
   - type: keyvalue
     name: acre-redis
+    region: frankfurt
     plan: free
     maxmemoryPolicy: noeviction
     ipAllowList: []
 
 databases:
   - name: acre-db
+    region: frankfurt
     plan: basic-256mb
     databaseName: acre
     user: acre
 
   - name: acre-temporal-db
+    region: frankfurt
     plan: basic-256mb
     databaseName: temporal
     user: temporal
