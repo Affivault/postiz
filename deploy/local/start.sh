@@ -6,6 +6,12 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# Fetch the latest setup files so changes never need a new ZIP download
+BASE="https://raw.githubusercontent.com/Affivault/postiz/main/deploy/local"
+for f in docker-compose.yaml docker-compose.public.yaml; do
+  if curl -fsSL "$BASE/$f" -o "$f.new" 2>/dev/null; then mv "$f.new" "$f"; else rm -f "$f.new"; fi
+done
+
 if [ ! -f .env ]; then
   echo "JWT_SECRET=$(openssl rand -hex 32)" > .env
 fi
