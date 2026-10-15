@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import { isGeneralServerSide } from '@gitroom/helpers/utils/is.general.server.side';
 import { redirect } from 'next/navigation';
 export const metadata: Metadata = {
-  title: `${isGeneralServerSide() ? 'Postiz' : 'Gitroom'} Register`,
+  title: `${isGeneralServerSide() ? 'Acre Social' : 'Gitroom'} Register`,
   description: '',
 };
 export default async function Auth(params: {searchParams: Promise<{provider: string}>}) {

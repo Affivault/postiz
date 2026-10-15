@@ -387,7 +387,7 @@ const OnboardingStep2: FC<{ onBack: () => void; onNext: () => void }> = ({
           <div className="text-[13px] text-customColor18 mt-[2px]">
             {t(
               'api_onboarding_description',
-              'Use the Postiz API from your own code, n8n or any other automation'
+              'Use the Acre Social API from your own code, n8n or any other automation'
             )}
           </div>
         </div>
@@ -446,7 +446,7 @@ const OnboardingStep2: FC<{ onBack: () => void; onNext: () => void }> = ({
               )
             : t(
                 'connector_onboarding_description',
-                'The fastest way: add Postiz with one click, you will be asked to sign in'
+                'The fastest way: add Acre Social with one click, you will be asked to sign in'
               )}
         </div>
       </div>
@@ -468,7 +468,7 @@ const OnboardingStep2: FC<{ onBack: () => void; onNext: () => void }> = ({
         <div className="text-[13px] text-customColor18 mt-[2px]">
           {t(
             'mcp_onboarding_description',
-            'Give your agent Postiz tools to create, schedule and manage posts'
+            'Give your agent Acre Social tools to create, schedule and manage posts'
           )}
         </div>
       </div>
@@ -491,7 +491,7 @@ const OnboardingStep2: FC<{ onBack: () => void; onNext: () => void }> = ({
                 onClick={() => setAuth(m)}
               >
                 {m === 'oauth'
-                  ? t('sign_in_no_api_key', 'Sign in with Postiz (no API key)')
+                  ? t('sign_in_no_api_key', 'Sign in with Acre Social (no API key)')
                   : t('api_key', 'API Key')}
               </button>
             ))}
@@ -503,7 +503,7 @@ const OnboardingStep2: FC<{ onBack: () => void; onNext: () => void }> = ({
             {auth === 'oauth' &&
               ` ${t(
                 'oauth_sign_in_hint',
-                'Your agent will open a browser window to sign in to Postiz.'
+                'Your agent will open a browser window to sign in to Acre Social.'
               )}`}
           </div>
           <pre className="bg-newBgColorInner border border-newBorder rounded-[8px] p-[12px] text-[12px] whitespace-pre-wrap break-all overflow-x-auto leading-[1.5]">
@@ -699,12 +699,12 @@ const OnboardingStep3: FC<{ onBack: () => void; onFinish: () => void }> = ({
     <div className="flex flex-col gap-[24px] flex-1">
       <div className="flex gap-[4px] flex-col text-center">
         <div className="text-[24px] font-semibold">
-          {t('watch_tutorial_title', 'Learn How to Use Postiz')}
+          {t('watch_tutorial_title', 'Learn How to Use Acre Social')}
         </div>
         <div className="text-[14px] text-customColor18">
           {t(
             'watch_tutorial_description',
-            'Watch this short video to learn how to get the most out of Postiz'
+            'Watch this short video to learn how to get the most out of Acre Social'
           )}
         </div>
       </div>
@@ -715,7 +715,7 @@ const OnboardingStep3: FC<{ onBack: () => void; onFinish: () => void }> = ({
           <iframe
             className="h-full aspect-video"
             src="https://www.youtube.com/embed/BdsCVvEYgHU?si=vvhaZJ8I5oXXvVJS?autoplay=1"
-            title="Postiz Tutorial"
+            title="Acre Social Tutorial"
             allow="autoplay"
             allowFullScreen
           />

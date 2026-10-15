@@ -89,6 +89,15 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/auth/login', nextUrl.href));
   }
 
+  // public pages: landing, terms and privacy (invite links /?org= still go to auth)
+  if (
+    !authCookie &&
+    !nextUrl.searchParams.get('org') &&
+    ['/', '/terms', '/privacy'].includes(nextUrl.pathname)
+  ) {
+    return topResponse;
+  }
+
   const org = nextUrl.searchParams.get('org');
   const url = new URL(nextUrl).search;
   if (!nextUrl.pathname.startsWith('/auth') && !authCookie) {

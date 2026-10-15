@@ -1,5 +1,5 @@
 ---
-name: "Deploy Private Instance"
+name: "Build and Deploy"
 
 # Builds this repo into a Docker image on every push to main, then redeploys
 # Render (render.yaml) and/or the server set up with deploy/private/setup.sh.
