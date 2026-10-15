@@ -1,41 +1,41 @@
-# Render Blueprint: private, single-user Postiz.
+# Render Blueprint: Acre Social.
 # Render dashboard -> New -> Blueprint -> pick this repo -> Apply.
-# Uses the image built from this repo by the "Deploy Private Instance"
-# GitHub Action (ghcr.io/affivault/postiz). Only the first account can sign up.
+# Uses the image built from this repo by the "Build and Deploy"
+# GitHub Action (ghcr.io/affivault/postiz). See deploy/render/README.md.
+#
+# - App data lives in Supabase (DATABASE_URL, asked for on first apply)
+# - Temporal (post scheduling) runs here with its own small Render Postgres
+# - Media is stored in Cloudflare R2
 services:
   - type: web
-    name: postiz
+    name: acre-social
     runtime: image
     image:
       url: ghcr.io/affivault/postiz:latest
     plan: standard
-    # Point the app at its own onrender.com address, then start it as usual.
-    # PORT=5000 tells Render where nginx listens; the backend itself stays on 3000.
+    # Use FRONTEND_URL when a custom domain is set, otherwise the onrender.com
+    # address. PORT=5000 tells Render where nginx listens; the backend itself
+    # stays on 3000.
     dockerCommand: >-
-      /bin/sh -c 'export PORT=3000 MAIN_URL="$RENDER_EXTERNAL_URL"
-      FRONTEND_URL="$RENDER_EXTERNAL_URL"
-      NEXT_PUBLIC_BACKEND_URL="$RENDER_EXTERNAL_URL/api"
+      /bin/sh -c 'URL="${FRONTEND_URL:-$RENDER_EXTERNAL_URL}"
+      && export PORT=3000 MAIN_URL="$URL" FRONTEND_URL="$URL"
+      NEXT_PUBLIC_BACKEND_URL="$URL/api"
       && cd /app && nginx && pnpm run pm2'
-    disk:
-      name: uploads
-      mountPath: /uploads
-      sizeGB: 2
     envVars:
       - key: PORT
         value: 5000
+      # Supabase -> Connect -> Session pooler connection string
       - key: DATABASE_URL
-        fromDatabase:
-          name: postiz-db
-          property: connectionString
+        sync: false
       - key: REDIS_URL
         fromService:
           type: keyvalue
-          name: postiz-redis
+          name: acre-redis
           property: connectionString
       - key: TEMPORAL_ADDRESS
         fromService:
           type: pserv
-          name: postiz-temporal
+          name: acre-temporal
           property: hostport
       - key: JWT_SECRET
         generateValue: true
@@ -43,17 +43,27 @@ services:
         value: http://localhost:3000
       - key: IS_GENERAL
         value: 'true'
-      - key: DISABLE_REGISTRATION
-        value: 'true'
       - key: STORAGE_PROVIDER
-        value: local
-      - key: UPLOAD_DIRECTORY
-        value: /uploads
-      - key: NEXT_PUBLIC_UPLOAD_DIRECTORY
-        value: /uploads
+        value: cloudflare
+      - key: CLOUDFLARE_ACCOUNT_ID
+        sync: false
+      - key: CLOUDFLARE_ACCESS_KEY
+        sync: false
+      - key: CLOUDFLARE_SECRET_ACCESS_KEY
+        sync: false
+      - key: CLOUDFLARE_BUCKETNAME
+        sync: false
+      # Public URL of the bucket (r2.dev or custom domain), no trailing slash
+      - key: CLOUDFLARE_BUCKET_URL
+        sync: false
+      - key: CLOUDFLARE_REGION
+        value: auto
+      # Optional: Sentry error monitoring
+      - key: NEXT_PUBLIC_SENTRY_DSN
+        sync: false
 
   - type: pserv
-    name: postiz-temporal
+    name: acre-temporal
     runtime: image
     image:
       url: docker.io/temporalio/auto-setup:1.28.1
@@ -67,27 +77,27 @@ services:
         value: 5432
       - key: POSTGRES_SEEDS
         fromDatabase:
-          name: postiz-db
+          name: acre-temporal-db
           property: host
       - key: POSTGRES_USER
         fromDatabase:
-          name: postiz-db
+          name: acre-temporal-db
           property: user
       - key: POSTGRES_PWD
         fromDatabase:
-          name: postiz-db
+          name: acre-temporal-db
           property: password
       - key: ENABLE_ES
         value: 'false'
 
   - type: keyvalue
-    name: postiz-redis
+    name: acre-redis
     plan: free
     maxmemoryPolicy: noeviction
     ipAllowList: []
 
 databases:
-  - name: postiz-db
+  - name: acre-temporal-db
     plan: basic-256mb
-    databaseName: postiz
-    user: postiz
+    databaseName: temporal
+    user: temporal

@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes acre-plant {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.acre-plant {
+  opacity: 0;
+  animation: acre-plant 420ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.acre-furrows {
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 27px,
+    rgba(97, 43, 211, 0.07) 27px,
+    rgba(97, 43, 211, 0.07) 28px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acre-plant {
+    opacity: 1;
+    animation: none;
+  }
+}

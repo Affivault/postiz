@@ -85,7 +85,7 @@ export const OAuthSelfHosted: FC<{
       </div>
 
       {/* plain text fields: a password field makes browsers autofill the
-          saved Postiz login (email + password) into this form */}
+          saved Acre Social login (email + password) into this form */}
       <Input
         name="instance_url"
         label="Instance URL"
