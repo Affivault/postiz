@@ -3,9 +3,10 @@
 # Uses the image built from this repo by the "Build and Deploy"
 # GitHub Action (ghcr.io/affivault/postiz). See deploy/render/README.md.
 #
-# - App data lives in Supabase (DATABASE_URL, asked for on first apply)
-# - Temporal (post scheduling) runs here with its own small Render Postgres
-# - Media is stored in Cloudflare R2
+# Everything runs on Render:
+# - App data in Render Postgres (acre-db)
+# - Temporal (post scheduling) with its own Render Postgres (acre-temporal-db)
+# - Uploaded media on a Render disk mounted at /uploads
 services:
   - type: web
     name: acre-social
@@ -21,12 +22,17 @@ services:
       && export PORT=3000 MAIN_URL="$URL" FRONTEND_URL="$URL"
       NEXT_PUBLIC_BACKEND_URL="$URL/api"
       && cd /app && nginx && pnpm run pm2'
+    disk:
+      name: uploads
+      mountPath: /uploads
+      sizeGB: 10
     envVars:
       - key: PORT
         value: 5000
-      # Supabase -> Connect -> Session pooler connection string
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: acre-db
+          property: connectionString
       - key: REDIS_URL
         fromService:
           type: keyvalue
@@ -44,20 +50,11 @@ services:
       - key: IS_GENERAL
         value: 'true'
       - key: STORAGE_PROVIDER
-        value: cloudflare
-      - key: CLOUDFLARE_ACCOUNT_ID
-        sync: false
-      - key: CLOUDFLARE_ACCESS_KEY
-        sync: false
-      - key: CLOUDFLARE_SECRET_ACCESS_KEY
-        sync: false
-      - key: CLOUDFLARE_BUCKETNAME
-        sync: false
-      # Public URL of the bucket (r2.dev or custom domain), no trailing slash
-      - key: CLOUDFLARE_BUCKET_URL
-        sync: false
-      - key: CLOUDFLARE_REGION
-        value: auto
+        value: local
+      - key: UPLOAD_DIRECTORY
+        value: /uploads
+      - key: NEXT_PUBLIC_UPLOAD_DIRECTORY
+        value: /uploads
       # Optional: Sentry error monitoring
       - key: NEXT_PUBLIC_SENTRY_DSN
         sync: false
@@ -97,6 +94,11 @@ services:
     ipAllowList: []
 
 databases:
+  - name: acre-db
+    plan: basic-256mb
+    databaseName: acre
+    user: acre
+
   - name: acre-temporal-db
     plan: basic-256mb
     databaseName: temporal
